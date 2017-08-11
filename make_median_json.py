@@ -35,9 +35,6 @@ class makeMedian(JsonModule):
 		querystr = inputDirectory + '/*' + filepart + spch + '.tif'
 		files = glob.glob(querystr)
 
-		print files
-		#exit(0)
-
 		#read the first image to find the size of the stack
 		img0 = tifffile.imread(files[0])
 		(N,M)=img0.shape
