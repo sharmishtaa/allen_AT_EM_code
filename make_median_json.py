@@ -1,23 +1,31 @@
 #input, root directory of images
-import argparse
+from argschema import ArgSchemaParser, ArgSchema
+from argschema.fields import Str
+from argschema.schemas import DefaultSchema
+#import argparse
 import os
 import csv
 import tifffile
 import numpy as np
 import glob
 from scipy.ndimage.filters import gaussian_filter
-import marshmallow as mm
-from json_module import JsonModule,ModuleParameters,InputDir
+import argschema
+#import marshmallow as mm
+#from json_module import JsonModule,ModuleParameters,InputDir
 
-class makeMedianParams(ModuleParameters):
-    inputDirectory = mm.fields.Str(required=True,
+
+
+
+#class makeMedianParams(ModuleParameters):
+class makeMedianParams(argschema.ArgSchema):
+    inputDirectory = Str(required=True,
         metadata={'description':'Input Directory Path'})
-    outputImage = mm.fields.Str(required=True,
+    outputImage = Str(required=True,
         metadata={'description':'Path of output Image'})
-    filepart = mm.fields.Str(required=False,
+    filepart = Str(required=False,
         metadata={'description':'Part of filename to parse by (usually the channel name or section name or combination)'})
 
-class makeMedian(JsonModule):
+class makeMedian(argschema.ArgSchemaParser):
     def __init__(self,schema_type=None,*args,**kwargs):
         if schema_type is None:
             schema_type = makeMedianParams
@@ -76,5 +84,12 @@ class makeMedian(JsonModule):
 
 if __name__ == '__main__':
 
-	mod = makeMedian(schema_type=makeMedianParams)
-	mod.run()
+
+    example_json = {
+        "inputDirectory": "/nas2/data/Datatest/data/session0/DAPI",
+        "outputImage": "/nas2/data/Datatest/testing/testmedian.tif",
+        "filepart": "S000",
+        "output_json" : "/nas2/data/Datatest/testing/output_json.json"
+    }
+    mod = makeMedian(input_data=example_json, schema_type=makeMedianParams)
+    mod.run()

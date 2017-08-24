@@ -1,15 +1,19 @@
+from argschema import ArgSchemaParser, ArgSchema
+from argschema.fields import Str
+from argschema.schemas import DefaultSchema
 import numpy as np
 import os
 import tifffile
-import argparse
+#import argparse
 #import matplotlib.pyplot as plt
 import cv2
 from scipy import ndimage
 from skimage.morphology import white_tophat, disk
 import marshmallow as mm
-from json_module import JsonModule,ModuleParameters,InputDir
+#from json_module import JsonModule,ModuleParameters,InputDir
+import argschema
 
-class multIntensityCorrParams(ModuleParameters):
+class multIntensityCorrParams(argschema.ArgSchema):
     inputImage = mm.fields.Str(required=True,
         metadata={'description':'Path of input image'})
     outputImage = mm.fields.Str(required=True,
@@ -17,7 +21,7 @@ class multIntensityCorrParams(ModuleParameters):
     flatfieldStandardImage = mm.fields.Str(required=True,
         metadata={'description':'Flat field standard Image'})
 
-class multIntensityCorr(JsonModule):
+class multIntensityCorr(argschema.ArgSchemaParser):
     def __init__(self,schema_type=None,*args,**kwargs):
         if schema_type is None:
             schema_type = multIntensityCorrParams
@@ -54,5 +58,11 @@ class multIntensityCorr(JsonModule):
 
 if __name__ == '__main__':
 
-    mod = multIntensityCorr(schema_type=multIntensityCorrParams)
+    example_json = {
+        "inputImage": "/nas2/data/Datatest/data/session0/DAPI/DAPI_S0000_F0006_Z00.tif",
+        "outputImage": "/nas2/data/Datatest/testing/testoutput.tif",
+        "flatfieldStandardImage": "/nas2/data/Datatest/testing/testmedian.tif",
+        "output_json" : "/nas2/data/Datatest/testing/output_json1.json"
+    }
+    mod = multIntensityCorr(input_data=example_json, schema_type=multIntensityCorrParams)
     mod.run()
